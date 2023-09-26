@@ -34,10 +34,10 @@ for curTime = 0:nTimeSteps-1
   end
 %   addInformSub = false;
   figure2(100), quiver(curPos(1, :), curPos(2, :), curVel(1, :), curVel(2, :), 'off')
-  title('Initial conditions'), hold on
+  hold on
   figure2(100), quiver(curPos(1, informSubjs), curPos(2, informSubjs),...
     curVel(1, informSubjs), curVel(2, informSubjs), 'off', 'color', 'r')
-  title('Initial conditions'), hold off
+  hold off
   axis square, ylim([-50 50]), xlim([-50 50]),
   drawnow, %pause(0.1)
 end

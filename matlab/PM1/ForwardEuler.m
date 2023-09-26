@@ -22,7 +22,7 @@ for n = 1 : ceil((t_stop-t_start)/timestep),
    f        = feval(eval_f, X(:,n), p, u);
    X(:,n+1) = X(:,n) +  dt * f;
    if visualize
-%      VisualsizeState(t,X,n+1,'.b');
+%      VisualizeState(t,X,n+1,'.b');
      VisualizeFlock(t(n+1), X(:, n+1), f, 2)
    end
 end
