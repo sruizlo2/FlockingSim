@@ -11,7 +11,7 @@ informed_dir = -pi / 4;
 % Constant speed value
 v_init = 1; % m/s
 % Radius of interation
-interaction_radius = 100; % m
+interaction_radius = 1; % m
 % Use random orientations or fixed
 test_indx = 2;
 switch test_indx
@@ -19,24 +19,21 @@ switch test_indx
     % Number of birds
     n_birds = 10;
     % Initial position and orientations
-    x_start = cat(1, zeros(2 * n_birds, 1),...
-      pi / 4 * ones(n_birds, 1));
+    x_start = zeros(2 * n_birds, 1);
     % Range for uniformly distributed random orientation fluctuations
     dir_fluc_range = 0.0; % rad
   case 2 % Random positions, constant orientations
     % Number of birds
-    n_birds = 1e1;
+    n_birds = 1e3;
     % Initial position and orientations
-    x_start = cat(1, 20 * (rand(2 * n_birds, 1) - 0.5),...
-      pi / 4 * ones(n_birds, 1));
+    x_start = 20 * (rand(2 * n_birds, 1) - 0.5);
     % Range for uniformly distributed random orientation fluctuations
     dir_fluc_range = 0.0; % rad
   case 3 % Random positions, Random orientations
     % Number of birds
     n_birds = 1e3;
     % Initial position and orientations
-    x_start = cat(1, 20 * (rand(2 * n_birds, 1) - 0.5),...
-      2*pi * (rand(n_birds, 1) - 0.5));
+    x_start = 20 * (rand(2 * n_birds, 1) - 0.5);
     % Range for uniformly distributed random orientation fluctuations
     dir_fluc_range = 0.0; % rad
 end
