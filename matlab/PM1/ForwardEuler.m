@@ -18,11 +18,11 @@ end
 for n = 1 : ceil((t_stop-t_start)/timestep),
    dt       = min(timestep, (t_stop-t(n)));
    t(n+1)   = t(n) + dt;
-   u        = feval(eval_u, t(n));
+   u        = feval(eval_u, [0 0], t(n));
    f        = feval(eval_f, X(:,n), p, u);
    X(:,n+1) = X(:,n) +  dt * f;
-   if visualize
+   if visualize && mod(n, 2) == 0
 %      VisualizeState(t,X,n+1,'.b');
-     VisualizeFlock(t(n+1), X(:, n+1), f, 2)
+     VisualizeFlockLJPot(t(n+1), X(:, n+1), f, 2, n);
    end
 end
