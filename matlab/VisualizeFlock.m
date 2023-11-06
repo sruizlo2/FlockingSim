@@ -1,4 +1,4 @@
-function VisualizeFlock(t, X, f, hFig, iter)
+function VisualizeFlock(t, X, f, hFig)
 % Speed, use to normalize vectors length in the plot
 speed = sqrt(f(1) .^ 2 + f(end / 3 + 1) .^ 2);
 % Polarization vector
