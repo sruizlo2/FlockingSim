@@ -30,11 +30,11 @@ switch test_indx
     % Initial past accelerations matching
     am0 = 0;
     % Initial position and orientations
-    x_start = repmat([-1, -1,  1,  1,... x
+    x_start = [-1, -1,  1,  1,... x
                -1,  1, -1,  1,... y
                v0, v0,  -v0,  -v0,... v_x
-               v0,  -v0, v0,  -v0,... v_y
-               am0 * ones(1, 2 * n_birds)]', [1 kappa + 1]);
+               v0,  -v0, v0,  -v0];... v_y
+    a_start = am0 * ones(2 * n_birds, kappa + 1);
     % Options for plotting
     fov = 5;
     markersize = 20;
@@ -47,11 +47,12 @@ switch test_indx
     cirle_angle = 2 * pi * rand(n_birds, 1);
     circle_radius = 25 * rand(n_birds, 1);
     local_dir_range = pi / 10;
-    % Initial position and orientations.
-    x_start = repmat(cat(1, circle_radius .* cos(cirle_angle),...
+    % Initial positions and velocities
+    x_start = cat(1, circle_radius .* cos(cirle_angle),...
       circle_radius .* sin(cirle_angle),...
-      v0 *(1 + 0.5 * (rand(2 * n_birds, 1) - 0.5)),...
-      am0 * ones(2 * n_birds, 1)), [1 kappa + 1]);
+      v0 *(1 + 0.5 * (rand(2 * n_birds, 1) - 0.5)));
+    % Initial accelerations, constant for all birds and time steps
+    a_start = am0 * ones(2 * n_birds, kappa + 1);
     % Options for plotting
     fov = 50;
     markersize = 5;
@@ -73,7 +74,7 @@ vid_filename = fullfile('../Output/StarlingMurmuration');
 parms = struct('n_birds', n_birds, 'Ca', Ca, 'Cr', Cr, 'lr', lr,...
   'v0', v0, 'alpha_', alpha_, 'Kv', Kv, 'Ka', Ka, 'kappa', kappa,...
   'r0', r0, 'c0', c0, 'lo_method', lo_method, 'potential_func', potential_func,...
-  'fov', fov, 'markersize', markersize); % Ploting options
+  'fov', fov, 'markersize', markersize, 'a', a_start); % Ploting options
 parms = NormalizeParameters(parms, ls, ts);
 % Evaluate functions with delayed Forward Euler method
 [X, t] = ForwardEulerWDelay(eval_f_delay, x_start, parms, eval_u, t_start,...

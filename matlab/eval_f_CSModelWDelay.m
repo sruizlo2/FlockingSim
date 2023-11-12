@@ -1,4 +1,4 @@
-function fOut = eval_f_CSModels(x, parms, u)
+function fOut = eval_f_CSModelWDelay(x, parms, u)
 
 % Unpack options
 StructToVars(parms)
@@ -9,7 +9,7 @@ r = x(1:2 * n_birds, end);
 % Current velocity [vx vy]
 v = x(2 * n_birds + 1:4 * n_birds, end);
 % Past accelerations matching terms [amxt amyt]
-aMatching = x(4 * n_birds + 1:end, :);
+aMatching = parms.a;
 % [drx, dry] and |dr|
 [~, dr, drnorm] = ReshapeAndPairWiseDifferences(r);
 % [dvx, dvy]
