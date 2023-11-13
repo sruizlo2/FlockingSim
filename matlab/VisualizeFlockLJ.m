@@ -8,6 +8,7 @@ polVectAngle = [mean(X(end / 2 + 1:3 * end / 4)), mean(X(3 * end / 4 + 1:end))];
 % Center of mass
 com = [mean(X(1:end / 4)), mean(X(end / 4 + 1: end / 2))];
 % Plot velocity vectors at each bird location
+markersize=20;
 figure2(hFig), quiver(X(1:end / 4), X(end / 4 + 1: end / 2),...
   X(end / 2 + 1:3 * end / 4) ./ norm, X(3 * end / 4 + 1:end) ./ norm,...
   'AutoScale', 'off', 'Color', 'k', 'Marker', '.', 'Markersize', markersize)
