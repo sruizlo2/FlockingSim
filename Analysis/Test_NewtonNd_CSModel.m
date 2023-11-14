@@ -1,6 +1,8 @@
 % Add path with functions
 addpath(genpath('../matlab'))
-
+%%
+% X_init = [];
+% X_config = [];
 %% PARAMETERS
 % Normalization constants
 ls = 1; % Length scale
@@ -20,7 +22,7 @@ c0 = 10;        % Scale factor for variance
 lo_method = 'var'; % Method to compute local order. 'var' for variance, 'pol' for polarization
 epsilon = 1e-14;
 potential_func = 'MorseWallForceAnalytical';
-test_indx = 1;
+test_indx = 2;
 switch test_indx
   case 1
     % Number of birds
@@ -40,7 +42,7 @@ switch test_indx
     markersize = 20;
   case 2
     % Number of birds
-    n_birds = 1e3;
+    n_birds = 5;
     % Initial position and orientations. For positions, let's place birds
     % randombly within a circle. For orientations, let's fix a global
     % orientation and add random orientation for each bird
@@ -49,8 +51,8 @@ switch test_indx
     local_dir_range = pi / 10;
     % Initial positions and velocities
     x_start = cat(1, circle_radius .* cos(cirle_angle),...
-      circle_radius .* sin(cirle_angle),...
-      v0 *(1 + 0.5 * (rand(2 * n_birds, 1) - 0.5)));
+      circle_radius .* sin(cirle_angle));
+      % v0 *(1 + 0.5 * (rand(2 * n_birds, 1) - 0.5)));
     % Initial accelerations, constant for all birds and time steps
     a_start = am0 * ones(2 * n_birds, kappa + 1);
     % Options for plotting
@@ -76,7 +78,7 @@ parms = NormalizeParameters(parms, ls, ts);
 errf      = 1e-12;		
 errDeltax = 1e-12;
 relDeltax = 1e-12;
-MaxIter   = 200;	
+MaxIter   = 100;	
 FiniteDifference = 0;
 visualize=1;
 % Evaluate functions with Newton solver
@@ -84,3 +86,8 @@ visualize=1;
 % Evaluate functions with Forward Euler method
 % [X, t] = ForwardEuler(eval_f, x_start(1:4*n_birds, end), parms, eval_u, t_start,...
 %   t_stop, timestep, true);
+
+X_config = cat(1,x_start,converged);
+X_init = cat(2,X_init,X_config);
+figure;
+scatter(X(1:end/2,end-1), X(end/2+1:end,end-1))
