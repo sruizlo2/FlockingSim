@@ -23,6 +23,6 @@ for n = 1 : ceil((t_stop-t_start)/timestep),
    X(:,n+1) = X(:,n) +  dt * f;
    if visualize && mod(n, 2) == 0
 %      VisualizeState(t,X,n+1,'.b');
-     VisualizeFlockLJ(t(n+1), X(:, n+1), p, 2);
+     VisualizeFlock(t(n+1), X(:, n+1), p, 2);
    end
 end

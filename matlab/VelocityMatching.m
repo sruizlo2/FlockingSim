@@ -9,7 +9,7 @@ function self_prop = VelocityMatching(drnorm, dv, parms)
 %
 
 % Weights
-weights = 1 ./ (1 + drnorm .^ 2) .^ 2;
+weights = 1 ./ (1 + (parms.ls * drnorm) .^ 2) .^ 2;
 % Velocity interations
 J = parms.Kv * weights;
 % Self-propulsion: Average velocity difference

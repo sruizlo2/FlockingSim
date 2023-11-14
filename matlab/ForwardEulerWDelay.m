@@ -1,4 +1,4 @@
-function [X,t] = ForwardEulerWDelay(eval_f,x_start,p,eval_u,t_start,t_stop,timestep,visualize)
+function [X,t,Y] = ForwardEulerWDelay(eval_f,x_start,p,eval_u,t_start,t_stop,timestep,visualize)
 % uses Forward Euler with delay to simulate states model dx/dt=f(x,x'(t-tau),p,u)
 % startin from state vector x_start at time t_start
 % until time t_stop, with time intervals timestep
@@ -11,20 +11,26 @@ function [X,t] = ForwardEulerWDelay(eval_f,x_start,p,eval_u,t_start,t_stop,times
 
 % max_delay = p.kappa;
 X(:,1) = x_start;
+Y(:,1) = ComputeOutputs(X(:,1), p);
 t(1)   = t_start;
 N = p.n_birds;
+frames = []; % Initialize video
 if visualize
 %    VisualizeState(t,X,1,'.b');
 end
 for n = 1 : ceil((t_stop-t_start)/timestep),
    dt       = min(timestep, (t_stop-t(n)));
    t(n+1)   = t(n) + dt;
-   u        = feval(eval_u, t(n));
-   f        = feval(eval_f, X(:,n), p, u);
-   X(:,n+1) = X(:,n) +  dt * f(1:4*N);
-   p.a = cat(2, p.a, f(4*N+1:end)); % Update accelerations
-   if visualize && mod(n, 4) == 0
+   u        = feval(eval_u, X(:,n), t(n), p);
+   [f, p]   = feval(eval_f, X(:,n), p, u);
+   X(:,n+1) = X(:,n) + dt * f;
+   Y(:,n+1) = ComputeOutputs(X(:,n+1), p);
+   if visualize && mod(n, p.plotStep) == 0
 %      VisualizeState(t,X,n+1,'.b');
-     VisualizeFlockLJ(t(n+1), X(1:4*N, n+1), p, 2);
+%      VisualizeObstacle(t(n+1), u, p, 2);
+     frames = VisualizeFlock(t(n+1), X(1:4*N, n+1), Y, p, visualize, frames);
    end
+end
+if ~isempty(p.vid_filename)
+  WriteFLockVisualization(frames, p.vid_filename)
 end

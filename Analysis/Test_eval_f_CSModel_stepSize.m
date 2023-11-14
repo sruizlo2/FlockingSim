@@ -1,6 +1,7 @@
 % Add path with functions
 addpath(genpath('../matlab'))
-outputFolder = '../Output';
+outputFolder = '../Output/testdt';
+mkdir(outputFolder)
 % Pre-defined parameters for plotting
 set(groot,'defaultAxesFontSize', 20)
 set(groot,'defaulttextInterpreter', 'latex')
@@ -52,7 +53,7 @@ switch test_indx
     v0 = 1;         % Terminal speed
     alpha_ = 0.2;   % Strenght of drag force
     Kv = 0.1;       % Interaction strength of velocity matching
-    Ka = 0.00;      % Interaction strength of acceleration matching
+    Ka = 0.0;      % Interaction strength of acceleration matching
     kappa = 800;    % Maximum time delay for acceleration matching
     r0 = 0.6;       % Minimum distance to compuate variance in local order computation
     c0 = 10;        % Scale factor for variance
@@ -92,64 +93,60 @@ eval_f = 'eval_f_CSModel';
 % Name of function to evaluate u()
 eval_u = 'eval_u_CSModel';
 % Time step
-timestep = 1;
-% Number of time points, initial and final time point
-t_points = 10000;
-t_start = 0;
-t_stop = timestep * t_points;
+for timestep = [0.1 0.5 1 5 10]
+  % Number of time points, initial and final time point
+  t_points = 2000 / timestep;
+  t_start = 0;
+  t_stop = timestep * t_points;
 
-filenamePrefix = 'StarlingMurmuration';
-filenameSufix = 'NoAM2';
-% Video file name
-vid_filename = fullfile(outputFolder, sprintf('%s_%s', filenamePrefix, filenameSufix));
-VisualizeFlockFigNum = 2; % False for not plotting flock
+  filenamePrefix = 'StarlingMurmuration';
+  filenameSufix = sprintf('NoAM_%.4f', timestep * ts);
+  % Video file name
+  vid_filename = fullfile(outputFolder, sprintf('%s_%s', filenamePrefix, filenameSufix));
+  % Struct with parameters
+  parms = struct('n_birds', n_birds, 'Ca', Ca, 'Cr', Cr, 'lr', lr,...
+    'v0', v0, 'alpha_', alpha_, 'Kv', Kv, 'Ka', Ka, 'kappa', kappa,...
+    'r0', r0, 'c0', c0, 'lo_method', lo_method,...
+    'fov', fov, 'markersize', markersize, 'linewidth', linewidth, 'a', a_start, ...
+    'ls', ls, 'ts', ts, 'vs', vs, 'plotStep', plotStep,...
+    'vid_filename', []); % Ploting options
+  % parms = NormalizeParameters(parms, ls, ts, 'fw');
+  % Evaluate functions with delayed Forward Euler method
+  tic
+  [X, t, Y] = ForwardEulerWDelay(eval_f_delay, x_start, parms, eval_u, t_start,...
+    t_stop, timestep, false);
+  toc
 
-% Struct with parameters
-parms = struct('n_birds', n_birds, 'Ca', Ca, 'Cr', Cr, 'lr', lr,...
-  'v0', v0, 'alpha_', alpha_, 'Kv', Kv, 'Ka', Ka, 'kappa', kappa,...
-  'r0', r0, 'c0', c0, 'lo_method', lo_method,...
-  'fov', fov, 'markersize', markersize, 'linewidth', linewidth, 'a', a_start, ...
-  'ls', ls, 'ts', ts, 'vs', vs, 'plotStep', plotStep,...
-  'vid_filename', vid_filename); % Ploting options
-% parms = NormalizeParameters(parms, ls, ts, 'fw');
-% Evaluate functions with delayed Forward Euler method
-[X, t, Y] = ForwardEulerWDelay(eval_f_delay, x_start, parms, eval_u, t_start,...
-  t_stop, timestep, VisualizeFlockFigNum);
-if useGPU
-  X = gather(X);
-  Y = gather(Y);
+  % Group ourder
+  groupOrder = Y(1, :);
+  % Group velocity
+  groupVelocity = [Y(2, :) Y(3, :)];
+  % Group speed
+  groupSpeed = Y(4, :);
+  % Group size
+  groupSize = Y(5, :);
+  % Center of mass
+  com = [Y(end-1, :); Y(end, :)];
+
+  %% Plot outputs
+  hFig = figure(3); subplot(221), plot(t * ts, groupOrder, 'k', 'linewidth', 2),
+  title('Group order'), xlabel('time [s]'), ylabel('$R$'), grid on, grid minor
+  ylim([0 inf]), xlim([0 inf])
+  convergeGroupOrder = mean(groupOrder(end-9:end));
+  legend(sprintf('$R$ --$>$ %.4f', convergeGroupOrder), 'interpreter', 'latex')
+
+  subplot(222), plot(t * ts, groupSpeed, 'k', 'linewidth', 2),
+  title('Group speed'), xlabel('time [s]'), ylabel('$U$ [m/s]'), grid on, grid minor
+  ylim([0 inf]), xlim([0 inf])
+  convergeGroupSpeed = mean(groupSpeed(end-9:end));
+  legend(sprintf('$U$ --$>$ %.4f', convergeGroupSpeed), 'interpreter', 'latex')
+
+  subplot(223), plot(t * ts, groupSize, 'k', 'linewidth', 2),
+  title('Group size'), xlabel('time [s]'), ylabel('$G$ [m]'), grid on, grid minor
+  ylim([0 inf]), xlim([0 inf])
+
+  subplot(224), plot(com(1, :), com(2, :), 'k.', 'markersize', 4),
+  title('Flock trayectory'), xlabel('$x$ [m]'), ylabel('$y$ [m]'), grid on, grid minor
+
+  saveas(hFig, fullfile(outputFolder, sprintf('%sOutputs_%s.png', filenamePrefix, filenameSufix)))
 end
-save(fullfile(outputFolder, sprintf('%s_%s.mat', filenamePrefix, filenameSufix)),...
-  'X', 't', 'Y', 'parms', '-v7.3');
-
-%% Load data
-data = load(fullfile(outputFolder, sprintf('%s_%s.mat', filenamePrefix, filenameSufix)));
-
-% Group ourder
-groupOrder = data.Y(1, :);
-% Group velocity
-groupVelocity = [data.Y(2, :) data.Y(3, :)];
-% Group speed
-groupSpeed = data.Y(4, :);
-% Group size
-groupSize = data.Y(5, :);
-% Center of mass
-com = [data.Y(end-1, :); data.Y(end, :)];
-
-%% Plot outputs
-hFig = figure(3); subplot(221), plot(data.t * data.parms.ts, groupOrder, 'k', 'linewidth', 2),
-title('Group order'), xlabel('time [s]'), ylabel('$R$'), grid on, grid minor
-ylim([-0.1 1.1]), xlim([-10 inf])
-
-subplot(222), plot(data.t * data.parms.ts, groupSpeed, 'k', 'linewidth', 2),
-title('Group speed'), xlabel('time [s]'), ylabel('$U$ [m/s]'), grid on, grid minor
-ylim([-0.1 1.1]), xlim([-10 inf])
-
-subplot(223), plot(data.t * data.parms.ts, groupSize, 'k', 'linewidth', 2),
-title('Group size'), xlabel('time [s]'), ylabel('$G$ [m]'), grid on, grid minor
-ylim([0 8]), xlim([-10 inf])
-
-subplot(224), plot(com(1, :), com(2, :), 'k.', 'markersize', 4),
-title('Flock trayectory'), xlabel('$x$ [m]'), ylabel('$y$ [m]'), grid on, grid minor
-
-saveas(hFig, fullfile(outputFolder, sprintf('%sOutputs_%s.png', filenamePrefix, filenameSufix)))

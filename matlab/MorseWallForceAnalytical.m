@@ -19,5 +19,5 @@ a(1:size(a, 1) + 1:end) = nan;
 % Acceleration vector [ax, ay]
 a = a .* cat(2, cos(theta), sin(theta));
 % Net acceleration is the sum of acceleration.
-a = sum(a, 3, 'omitnan') + u;
+a = sum(a, 3, 'omitnan');
 a = a(:);

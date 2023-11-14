@@ -8,10 +8,14 @@ function self_prop = AccelerationMatching(drnorm, a, parms)
 %   self_prop : Acceleration due to velocity matching
 %
 
-% Weights
-weights = 1 ./ (1 + drnorm .^ 2) .^ 2;
-% Acceleration interations
-I = parms.Ka * weights;
-% Self-propulsion: Average velocity difference + Average aceleration
-self_prop = squeeze(sum( I .* a, 1))';
-self_prop = self_prop(:);
+if parms.Ka ~= 0
+  % Weights
+  weights = 1 ./ (1 + (parms.ls * drnorm) .^ 2) .^ 2;
+  % Acceleration interations
+  I = parms.Ka * weights;
+  % Self-propulsion: Average velocity difference + Average aceleration
+  self_prop = squeeze(sum( I .* a, 1))';
+  self_prop = self_prop(:);
+else
+  self_prop = zeros(numel(a), 1);
+end

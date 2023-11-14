@@ -1,15 +1,15 @@
-function fOut = eval_f_CSModelWDelay(x, parms, u)
+function [fOut, parms] = eval_f_CSModelWDelay(x, parms, u)
 
 % Unpack options
 StructToVars(parms)
 
-% Input x is [x, y vx, vy]
+% Input x is [rx, ry vx, vy]
 % Current positions [rx ry]
 r = x(1:2 * n_birds, end);
 % Current velocity [vx vy]
 v = x(2 * n_birds + 1:4 * n_birds, end);
 % Past accelerations matching terms [amxt amyt]
-aMatching = parms.a;
+aMatching = parms.a(:, end-kappa:end);
 % [drx, dry] and |dr|
 [~, dr, drnorm] = ReshapeAndPairWiseDifferences(r);
 % [dvx, dvy]
@@ -27,10 +27,14 @@ PastAccelerationMatching = aMatching(linearIndxs);
 a = VelocityMatching(drnorm, dv, parms) +...% First term: self-propulsion response to velocity matching
     PastAccelerationMatching(:) +...% Second term: self-propulsion response to acceleration matching
     TerminalVelocity(v, parms) +... & Third term: drag force
-    MorseWallForceAnalytical(dr, drnorm, parms, u); % Force due to attractive and repulsive potentials % Morse_Wall_Force(potential_func, parms, r, u)
+    1 / parms.ls * MorseWallForceAnalytical(parms.ls * dr, parms.ls * drnorm, parms, u) +...% Force due to attractive and repulsive potentials
+    u; % Constant acceleration
 % [ax, axy]
 axy = ReshapeAndPairWiseDifferences(a);
 % Current weighted-averange of accelerations, need to keep this in history
 CurrAccelerationMatching = AccelerationMatching(drnorm, axy, parms);
+% Update acceleration matching
+parms.a = cat(2, parms.a, CurrAccelerationMatching); 
 
-fOut = cat(1, v, a, CurrAccelerationMatching);
+% Output value of f, scale with appropiate characteristic scales
+fOut = cat(1, v / parms.vs, a * parms.ts);
