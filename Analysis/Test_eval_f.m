@@ -9,12 +9,12 @@ add_informed_birds = false;
 % Informed direction bias
 informed_dir = -pi / 4;
 % Constant speed value
-v_init = 1; % m/s
+v_init = 10; % m/s
 % Radius of interation
 interaction_radius = 100; % m
 % Use random orientations or fixed
 % Field of view: Angle each bird can see (in rads)
-fov =  2 * (pi / 2);
+fov =  2 * (pi / 8);
 test_indx = 2;
 switch test_indx
   case 1 % Constat positions, constant orientations
@@ -37,7 +37,7 @@ switch test_indx
     x_start = cat(1, cat(1, circle_radius .* cos(cirle_angle), circle_radius .* sin(cirle_angle)),...
       global_dir + local_dir_range * rand(n_birds, 1));
     % Range for uniformly distributed random orientation fluctuations
-    dir_fluc_range = 0.0; % rad
+    dir_fluc_range = 0.1; % rad
   case 3 % Random positions, Random orientations
     % Number of birds
     n_birds = 1e3;
@@ -55,7 +55,8 @@ switch test_indx
     dir_fluc_range = 0;
   case 5
     n_birds = 5;
-    x_start = [-1 -1 1 1 0     -1 1 -1 1 0     pi/2 pi/2 pi/2 pi/2 pi/2];%
+    x_start = [-1 -1 1 1 0    -1 1 -1 1 0    pi/2+0.2 pi/2 pi/2 pi/2 pi/2];%
+    dir_fluc_range = 0.1; % rad
 end
 
 % Indices of informed birds
@@ -65,17 +66,18 @@ eval_f = 'eval_f_PM2';
 % Name of function to evaluate u()
 eval_u = 'eval_u';
 % Response time parameter
-Gamma = 100;
+Gamma1 = 10;
+Gamma2 = 10;
 % Time step
-timestep = 1;
+timestep = .5;
 % Number of time points, initial and final time point
-t_points = 100;
+t_points = 1000;
 t_start = 0;
 t_stop = timestep * t_points;
 % Struct with parameters
 params = struct('interaction_radius', interaction_radius,...
   'dir_fluc_range', dir_fluc_range, 'n_birds', n_birds,...
-  'Gamma', Gamma, 'v_init', v_init, 'fov', fov,...
+  'Gamma1', Gamma1, 'Gamma2', Gamma2, 'v_init', v_init, 'fov', fov,...
   'add_inform_birds', add_informed_birds,...
   'informed_birds', informed_birds, 'informed_dir', informed_dir);
 % Evaluate functions with Forward Euler method

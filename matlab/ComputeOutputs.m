@@ -1,4 +1,4 @@
-function Y = ComputeOutputs(x, parms)
+function [Y, corrF, corrR] = ComputeOutputs(x, parms, doCorr)
 
 % Input x is [rx, ry vx, vy]
 % Current positions [rx ry]
@@ -23,5 +23,16 @@ com = mean(rxy, 1);
 % Group size
 groupSize = mean(vecnorm(rxy - com, 2, 2), 1);
 
+% Correlations
+if doCorr
+  [corrF(:, 1), corrF(:, 2)] = CorrelationFunction(drnorm, vxy, parms);
+  % Correlation distances
+  [corrR(1), corrR(2)] = CorrelationDistance(corrF(:, 1), corrF(:, 2), parms);
+end
 % Outputs
 Y = cat(1, groupOrder, groupVelocity', groupSpeed, groupSize, com');
+
+% Move from GPU
+if parms.useGPU
+  Y = gather(Y);
+end

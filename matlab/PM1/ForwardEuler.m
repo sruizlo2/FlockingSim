@@ -10,7 +10,7 @@ function [X,t] = ForwardEuler(eval_f,x_start,p,eval_u,t_start,t_stop,timestep,vi
 % [X,t] = ForwardEuler(eval_f,x_start,p,eval_u,t_start,t_stop,timestep,visualize);
 
 
-X(:,1) = x_start;
+X(:,1) = x_start;open 
 t(1)   = t_start;
 if visualize
 %    VisualizeState(t,X,1,'.b');

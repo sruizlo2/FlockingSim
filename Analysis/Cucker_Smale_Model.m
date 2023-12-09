@@ -101,7 +101,7 @@ N = length(r) / 2;
 v =  [1  2  1  1  0 0  0 0]';
 [~, dv] = ReshapeAndPairWiseDifferences(v);
 % Bird accelerations
-a =  [1  2  1  1  0 0  0 0]';
+a =  [1  1  1  1  5 0  0 0]';
 a_vect = ReshapeAndPairWiseDifferences(a);
 forces_mag = 1;
 
@@ -226,6 +226,7 @@ parms = struct('n_birds', n_birds, 'Ca', Ca, 'Cr', Cr, 'lr', lr,...
 
 % Evaluate function
 x = cat(1, r, v);
+parms.update_a = false;
 fOut = eval_f_CSModelWDelay(x, parms, u);
 
 % plot velocities
@@ -264,6 +265,8 @@ title('Jacobian'), xlabel('[$x$~$y$~$v_x$~$v_y$]'), ylabel('[$v_y$~$v_x$]'), col
 figure(7), subplot(224),
 imagesc(flip(JacobianFD(end/2+1:end, :), 5), [-2.5 2.5]), axis image, colormap(gray(256)),
 title('Jacobian'), xlabel('[$x$~$y$~$v_x$~$v_y$]'), ylabel('[$a_y$~$a_x$]'), colorbar
+
+
 
 %% Convergence of Jacobian norm for simple case
 k = 0;

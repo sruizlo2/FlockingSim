@@ -1,4 +1,4 @@
-function fOut = eval_f(X, params, u)
+function fOut = eval_f_PM2(X, params, u)
 % Seed for random fluctuation generation
 if isfield(params, 'seed')
   rng(params.seed)
@@ -35,9 +35,17 @@ weights = exp(-distances2 / 1);
 weights = weights ./ sum(weights, 1);
 % Average direction of vectors connecting each pair of birds
 average_dir = angle(sum(exp(1i * cur_rel_dir .* interations) .* weights, 1, 'omitnan'));
+% average_dir = angle(sum(exp(1i * cur_dir), 1, 'omitnan')) - cur_dir';
 % Generate random fluctuations
 dir_fluc = 2 * dir_fluc_range * (rand(1, n_birds) - 0.5);
-angle_change = (average_dir / Gamma + dir_fluc)';
+% Polarization vectors
+pol_Vect_Angle = atan2(mean(vel(end/2+1:end)), mean(vel(1:end/2)));
+depretadorAngle = (rand() < 0.1) * pi * (rand() - 0.5);
+% depretadorAngle = 2 * dir_fluc_range * (rand() - 0.5);
+pol_angle_change = angle((exp(1i * (pol_Vect_Angle - cur_dir' + depretadorAngle)) ./ Gamma1 + ...
+  exp(1i * average_dir) ./ Gamma2) .* exp(1i * dir_fluc))';
 % Generate output function [f_1 f_2 f_3]
+% angle_change = ((average_dir ./ Gamma1 + Pol_angle_change ./ Gamma2) + dir_fluc)';
+angle_change = pol_angle_change;
 fOut = cat(1, vel, angle_change);
 end

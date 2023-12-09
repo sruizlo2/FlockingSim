@@ -11,7 +11,7 @@ LINE_WIDTH = 1.5;
 %% PARAMETERS
 % Normalization constants
 ls = 1;       % Length scale
-ts = 0.1;     % Time scale
+ts = .1;     % Time scale
 vs = ls / ts; % Speed scale
 test_indx = 2;
 useGPU = true;
@@ -26,7 +26,7 @@ switch test_indx
     alpha_ = 0.2;   % Strenght of drag force
     Kv = 0.1;       % Interaction strength of velocity matching
     Ka = 0.12;      % Interaction strength of acceleration matching
-    kappa = 100;    % Maximum time delay for acceleration matching
+    kappa = 800;    % Maximum time delay for acceleration matching
     r0 = 10;        % Minimum distance to compuate variance in local order computation
     c0 = 10;        % Scale factor for variance
     lo_method = 'var'; % Method to compute local order. 'var' for variance, 'pol' for polarization
@@ -61,13 +61,14 @@ switch test_indx
     am0 = 0;
 
     % Number of birds
-    n_birds = 1e3;
+    n_birds = 4e3;
     % Initial position and orientations. For positions, let's place birds
     % randombly within a circle. For orientations, let's fix a global
     % orientation and add random orientation for each bird
     % Initialize random positions within a circle
+    rng('default');
     cirle_angle = 2 * pi * rand(n_birds, 1);
-    circle_radius = 10 * sqrt(rand(n_birds, 1));
+    circle_radius = 10 * sqrt(rand(n_birds, 1));6
     % Initial positions and velocities
     x_start = cat(1, circle_radius .* cos(cirle_angle),...
       circle_radius .* sin(cirle_angle),...
@@ -114,7 +115,7 @@ parms = struct('n_birds', n_birds, 'Ca', Ca, 'Cr', Cr, 'lr', lr,...
 % parms = NormalizeParameters(parms, ls, ts, 'fw');
 % Evaluate functions with delayed Forward Euler method
 [X, t, Y] = ForwardEulerWDelay(eval_f_delay, x_start, parms, eval_u, t_start,...
-  t_stop, timestep, VisualizeFlockFigNum);
+  t_stop, timestep, VisualizeFlockFigNum, true, true);
 if useGPU
   t = gather(t);
   X = gather(X);
