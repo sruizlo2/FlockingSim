@@ -24,7 +24,7 @@ Y3 = Trap3.Trap.YTrap;
 
 %% Visualize final flock distribution
 vis = struct();
-vis.fov = 30;             % Maximum FOV in X and Y
+vis.fov = 25;             % Maximum FOV in X and Y
 vis.markersize = 5;       % Size of the dots that represent birds
 vis.linewidth = 0.15;     % Linewidth of the bird velocity arror
 vis.plotFPS     = [];     % Number of visualization (frames) per second (default is 1 fps)
@@ -53,24 +53,27 @@ hFig.WindowState = 'maximized';
 
 visnan1 = vis1;
 visnan1.legendOn = true;
+visnan1.titlename = '';
 visnan1.background_color = [1 1 1]; % Color of plot background
 visnan2 = vis2;
 visnan2.legendOn = true;
+visnan2.titlename = '';
 visnan2.background_color = [1 1 1]; % Color of plot background
 visnan3 = vis3;
 visnan3.legendOn = true;
+visnan3.titlename = '';
 visnan3.background_color = [1 1 1]; % Color of plot background
 
 set(gcf,'color','w');
 
 figure(nFig), subplot(6,3, [13 18]), plot(nan, nan), hold on
-figure(nFig), subplot(12,3, [19 22]), 
+figure(nFig), subplot(12,9, [57 64]), 
 VisualizeFlock(1, nan, [nan 0 0 1 nan 1 1], visnan1, nFig, [], false);
 hold off, axis off
-figure(nFig), subplot(12,3, [20 23]), 
+figure(nFig), subplot(12,9, [60 68]), 
 VisualizeFlock(1, nan, [nan 0 0 1 nan 1 1], visnan2, nFig, [], false);
 hold off, axis off
-figure(nFig), subplot(12,3, [21 24]), 
+figure(nFig), subplot(12,9, [62 72]), 
 VisualizeFlock(1, nan, [nan 0 0 1 nan 1 1], visnan3, nFig, [], false);
 hold off, axis off
 

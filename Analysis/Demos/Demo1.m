@@ -44,7 +44,7 @@ end
 % Video file name
 filenamePrefix = 'Murmuration';
 filenameSufix = 'FE';
-parmsOut.vis.vid_filename = fullfile(outputFolder, sprintf('%s_%s_Demo1',...
+parmsOut.vis.vid_filename = []; fullfile(outputFolder, sprintf('%s_%s_Demo1',...
   filenamePrefix, filenameSufix));
 parmsOut.vis.legendOn = true;
 parmsOut.vis.drawnowOn = true;
