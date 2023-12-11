@@ -20,7 +20,11 @@ end
 X(:,1) = x_start;
 p.n_neighborhood = [];
 p.timedelays = [];
-[Y(:,1), corrF(:, :, 1), corrR(:, 1)] = ComputeOutputs(X(:,1), p, true);
+if p.NCorr > 0
+  [Y(:,1), corrF(:, :, 1), corrR(:, 1)] = ComputeOutputs(X(:,1), p, true);
+else
+  Y(:,1) = ComputeOutputs(X(:,1), p, false);
+end
 t(1)   = t_start;
 % Number of birds
 N = p.n_birds;
@@ -63,8 +67,12 @@ for n = 1 : ceil((t_stop-t_start)/timestep)
   end
 
   if mod(n, compute_XY_rate) == 0
-    [Y(:,m+1), corrF(:, :, m+1), corrR(:, m+1)] =...
-      ComputeOutputs(X, p, true);
+    if p.NCorr > 0
+      [Y(:,m+1), corrF(:, :, m+1), corrR(:, m+1)] =...
+        ComputeOutputs(X, p, true);
+    else
+      Y(:,m+1) = ComputeOutputs(X, p, false);
+    end
   end
 
   if visualize && mod(n, plotStep) == 0
@@ -90,7 +98,7 @@ end
 
 if visualize && ~isempty(p.vis.vid_filename)
   % Play speed 10 fps
-  framerate = length(frames) / t_stop * 10;
+  framerate = length(frames) / t_stop * p.vis.fps;
   WriteFlockVisualization(frames, framerate, ...
     sprintf('%s_dt_%.0e.avi', p.vis.vid_filename, timestep))
 end

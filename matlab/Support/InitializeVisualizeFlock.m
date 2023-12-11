@@ -27,3 +27,19 @@ end
 if ~isfield(parms, 'subtitlename')
   parms.subtitlename = '';
 end
+
+if ~isfield(parms, 'axesoff')
+  parms.axesoff = false;
+end
+
+if ~isfield(parms, 'fps')
+  parms.fps = 10;
+end
+
+if ~isfield(parms, 'drawnowOn')
+  parms.drawnowOn = true;
+end
+
+if ~isfield(parms, 'legendOn')
+  parms.legendOn = true;
+end

@@ -30,14 +30,27 @@ viscircles(com, groupSize, 'color', flock_color); hold off
 % ylim([-fov fov] + sign(com(2)) * floor(abs(com(2)) / (fov/3)) * (fov/3)),
 xlim([-fov fov] + com(1)),
 ylim([-fov fov] + com(2)),
-axis square, ylabel('$y$ [m]'), xlabel('$x$ [m]'),
+axis square, 
+if axesoff
+  xticks([]), yticks([])
+else
+  ylabel('$z$ [m]'), xlabel('$y$ [m]'),
+end
 set(gca,'Color', background_color)
-  title(sprintf('Flock at time %.1f s', t), subtitlename),
-legend('Bird velocity vectors', 'Group velocity vector', 'Group size $G$',...
+if ~exist('titlename', 'var')
+  titlename = sprintf('Flock at time %.1f s', t);
+end
+title(titlename, subtitlename),
+if legendOn
+  legend('Bird velocity vectors', 'Group velocity vector $\mathbf{U}$', 'Group size $G$',...
   'interpreter', 'latex', 'location', 'northeast')
+end
+  
 % hold on,  quiver(com(1), com(2), polVectAngle(1), polVectAngle(2),...
 %   'Color', 'r', 'linewidth', 2), hold off
-drawnow
+if drawnowOn
+  drawnow
+end
 
 if init
   h = figure(hFig);

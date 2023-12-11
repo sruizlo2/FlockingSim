@@ -18,8 +18,8 @@ eval_u = 'eval_u_CSModel';
 eval_y = 'ComputeOutputs';
 
 %% PARAMETERS
-parms = ModelParameters2;
-parms.Ka = parms.Ka * 3;
+parms = ModelParameters;
+parms.Ka = parms.Ka * 4;
 % Use GPU?
 parms.useGPU = true;
 

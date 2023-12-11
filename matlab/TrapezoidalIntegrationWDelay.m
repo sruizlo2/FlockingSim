@@ -137,7 +137,7 @@ end
 if visualize
   if ~isempty(p.vis.vid_filename)
     % Play speed 10 fps
-    framerate = length(frames) / t_stop * 10;
+    framerate = length(frames) / t_stop * p.vis.fps;
     WriteFlockVisualization(frames, framerate, ...
       sprintf('%s_dt_%.0e.avi', p.vis.vid_filename, timestep))
   end

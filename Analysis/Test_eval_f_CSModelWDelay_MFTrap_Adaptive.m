@@ -1,6 +1,6 @@
 % Add path with functions
 addpath(genpath('../matlab'))
-outputFolder = '../Output/MFTrapNoAM';
+outputFolder = '../Output/MFAdaptiveTrapNoAM-del';
 [~, ~, ~] = mkdir(outputFolder);
 % Pre-defined parameters for plotting
 set(groot,'defaultAxesFontSize', 20)
@@ -28,8 +28,8 @@ parms.lr = 0.05;      % Effective distance of the repulsion 0.15
 parms.v0 = 1.00;      % Terminal speed
 parms.alpha_ = 0.2;   % Strenght of drag force
 parms.Kv = 0.1;       % Interaction strength of velocity matching
-parms.Ka = 0.00;      % Interaction strength of acceleration matching
-parms.kappa = 0;      % Maximum time delay for acceleration matching (in 1/10 seconds)
+parms.Ka = 0.12;      % Interaction strength of acceleration matching
+parms.kappa = 800;      % Maximum time delay for acceleration matching (in 1/10 seconds)
 parms.r0 = 0.6;       % Minimum distance to compuate variance in local order computation
 parms.c0 = 10;        % Scale factor for variance
 parms.lo_method = 'var'; % Method to compute local order. 'var' for variance, 'pol' for polarization
@@ -129,7 +129,19 @@ save(sprintf('%s_dt_%.0e.mat', outputFilename, timestep), 'Trap', 'TrapTime', '-
 %% Trapezoidal integration with adaptive delta t
 
 else
-[XTrap, tTrap, YTrap] = TrapezoidalIntegrationWDelayAdaptive_v2(eval_f_delay,...
-  x_start, parms, eval_u, t_start, t_stop, timestep,...
-  'MF', eval_y, VisualizeFlockFigNum, keepHist, vebosity);
+  tic
+  [XTrap, tTrap, YTrap, parms] = TrapezoidalIntegrationWDelayAdaptive_v2(eval_f_delay,...
+    x_start, parms, eval_u, t_start, t_stop, timestep,...
+    'MF', eval_y, VisualizeFlockFigNum, keepHist, vebosity);
+  TrapTime = toc;
+  fprintf('Total time: %.3f min\n', TrapTime / 60)
+  VisualizeOutputs(YTrap, corrRTrap, parms.visOut, t_start, t_stop, 300, sprintf('%s_dt_%.0e',...
+    parms.vis.vid_filename, timestep));
+  Trap.XTrap = XTrap;
+  Trap.YTrap = YTrap;
+  Trap.tTrap = [tTrap(1) tTrap(end)];
+  nNeighsTrap = parmsOut.n_neighborhood;
+  timedelaysTrap = (parms.kappa - parmsOut.timedelays) * timestep;
+  save(sprintf('%s_dt_%.0e.mat', outputFilename, timestep), 'Trap',...
+    'nNeighsTrap', 'corrRTrap', 'TrapTime', 'timedelaysTrap', '-v7.3')
 end

@@ -19,6 +19,7 @@ eval_y = 'ComputeOutputs';
 
 %% PARAMETERS
 parms = ModelParameters;
+parms.NCorr = 50;
 parms.Ka = 0;
 parms.kappa = 0;
 % Use GPU?
@@ -55,6 +56,7 @@ parms.vis.background_color = [0.7 0.9 0.95]; % Color of plot background
 parms.vis.flock_color = [1 0.0784 0.1373];   % Color or visualization of flock outputs
 parms.vis.birds_color = [0 0 0];             % Color or birds arrors
 parms.vis = InitializeVisualizeFlock(parms.vis); % Set unset parameters to default values
+parms.vis.fps = 3;
 
 % Video file name
 filenamePrefix = 'Murmuration';
@@ -76,10 +78,10 @@ parms.visOut.com_limsY = [-10 80];       % Y limits for group center of mass
 parms.visOut.showcorr = true;           % Whether to show correlation distances plots
 parms.visOut = InitializeVisualizeOutputs(parms.visOut); % Set unset parameters to default values
 
-%% Integrate via Forward Euler
+%% Integrate via Forward Euler seed
 % Options for Forward Euler
 t_start = 0;        % Starting time
-t_stop = 15;       % Ending time
+t_stop = 10;        % Ending time
 keepHist = false;   % Keep history or only last solution and output?
 visualize = 1;      % Number of figure to visualize plot (false for not plotting)
 verbsoity = false;  % Print progress of FE?
@@ -87,6 +89,27 @@ progstep = 10;      % Percentange of progress of FE to show
 timestep = 0.1;     % Time step
 % Name of the output .mat file
 outputFilename = fullfile(outputFolder, sprintf('%s_%s_Demo1Seed',...
+  filenamePrefix, filenameSufix));
+% GenerateFEReference(nVect, outputFilename, eval_f_delay, eval_u, parms, FEparms);
+% Forward Euler
+[XFE, t, YFE, corrF, corrR, parmsOut] = ForwardEulerWDelay(eval_f_delay,...
+  x_start, parms, eval_u, t_start, t_stop, timestep, visualize, keepHist, verbsoity);
+% Save initial conditions
+save(sprintf('%s_dt_%.0e.mat', outputFilename, timestep), 'XFE', 'parmsOut', '-v7.3')
+
+%% Integrate via Forward Euler seed
+% Options for Forward Euler
+t_start = 0;        % Starting time
+t_stop = 60;        % Ending time
+keepHist = false;   % Keep history or only last solution and output?
+visualize = 1;      % Number of figure to visualize plot (false for not plotting)
+verbsoity = false;  % Print progress of FE?
+progstep = 10;      % Percentange of progress of FE to show
+timestep = 0.1;     % Time step
+% Name of the output .mat file
+parms.vis.vid_filename = fullfile(outputFolder, sprintf('%s_%s_Demo1Full',...
+  filenamePrefix, filenameSufix));
+outputFilename = fullfile(outputFolder, sprintf('%s_%s_Demo1Full',...
   filenamePrefix, filenameSufix));
 % GenerateFEReference(nVect, outputFilename, eval_f_delay, eval_u, parms, FEparms);
 % Forward Euler
